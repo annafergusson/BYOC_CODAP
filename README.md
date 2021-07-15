@@ -4,7 +4,7 @@ Bring Your Own Code - a CODAP data plugin
 
 ## What is it?
 
-The result of me hacking a {![learnr](https://rstudio.github.io/learnr/)} tutorial (a shiny_prerendered app) using one code exercise and more hacky Javascript I wrote to connect the output to CODAP.
+The result of me hacking a {[learnr](https://rstudio.github.io/learnr/)} tutorial (a shiny_prerendered app) using one code exercise and more hacky Javascript I wrote to connect the output to CODAP.
 
 This means if you want different packages to be available in BYOC, just change the `index.Rmd` for the {learnr} tutorial. 
 
