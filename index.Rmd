@@ -1,0 +1,238 @@
+---
+title: BYOC
+output: 
+  html_document:
+    df_print: paged
+    includes:
+      in_header: header.html
+      after_body: ./www/favicon.html
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+
+# a starting list of packages I use a lot for intro stats
+library(ggplot2)
+library(tibble)
+library(tidyr)
+library(dplyr)
+library(magrittr)
+library(readr)
+library(stringr)
+library(purrr)
+library(forcats)
+library(glue)
+library(lubridate)
+library(knitr)
+library(jsonlite)
+library(magick)
+library(htmltools)
+library(rvest)
+library(httr)
+
+# helpful
+library(mosaic)
+
+# special packages
+library(spotifyr)
+
+# for cleaner output
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4)
+
+tutorial_options(exercise.timelimit = 90)
+
+# I think the stuff below means the previous code is not cached but ???
+options(tutorial.storage = list(
+  # save an arbitrary R object "data" to storage
+   save_object = function(tutorial_id, tutorial_version, user_id, object_id, data) {},
+  # retreive a single R object from storage
+  get_object = function(tutorial_id, tutorial_version, user_id, object_id) { 
+    NULL 
+  },
+  # retreive a list of all R objects stored
+  get_objects = function(tutorial_id, tutorial_version, user_id) { 
+    list() 
+  },
+  # remove all stored R objects
+  remove_all_objects = function(tutorial_id, tutorial_version, user_id) {
+  }
+))
+
+# my function to get data frame from here to CODAP
+update_table <- function(name, df){
+  name <- list(tableName = name)
+  more <- list(data = df)
+  stuff <- list(name, more)
+  toJSON(stuff) %>%
+  paste0("<pre class='CODAP'>", . , "</pre>") %>% asis_output()
+}
+```
+
+<div id="loader"></div>
+
+```{r live-code, exercise=TRUE}
+mixer <- c("c", "a", "t")
+
+outcome <- sample(mixer, 1)
+
+data <- tibble(outcome)
+             
+update_table("generatedData", data)
+```
+
+```{css}
+/* Absolute Center Spinner */
+.loading {
+  z-index: 999;
+  overflow: show;
+  margin: auto;
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.3);
+}
+
+.title{
+  display:none;
+}
+
+img {
+  width:80%;
+}
+
+.CODAP {
+  display:none;
+}
+```
+
+```{js}
+$().ready(function(){
+  
+  //----------------------------------------------------------------------------
+  // listen for changes to output div
+  var target = document.querySelector('#tutorial-exercise-live-code-output')
+  var observer = new MutationObserver(function(mutations) {
+    doStuff(); 
+  });
+  var config = { attributes: true, childList: true, characterData: true };
+  observer.observe(target, config);
+  //----------------------------------------------------------------------------
+
+// should I put in autosave for code?
+ 
+  // set codeR interface
+  var kAppName = "BYOC";
+  var kVersion = "1.0";
+  var kDimensions = {width: 400, height: 400};
+  
+  codapInterface.init({
+    title: kAppName,
+    dimensions: kDimensions,
+    version: kVersion,
+    preventDataContextReorg: false,
+  }).then(function (result) {
+    myState = codapInterface.getInteractiveState();
+  }).then(function () {
+  // initialise code box
+    if (myState.code === undefined || myState.code === null) {
+      // do nothing
+    }
+    else
+    {
+  	  var editor = ace.edit("tutorial-exercise-live-code-code-editor");
+      editor.setValue(myState.code); 
+      var line_last = editor.session.getLength();
+      editor.gotoLine(line_last);
+      editor.setOptions({maxLines: Infinity});
+    }
+  }).catch(function (msg) {
+    console.log(msg);
+  });
+
+function doStuff(){
+  $(".CODAP").each(function() {
+    //save current code - maybe should autosave?
+    var editor = ace.edit("tutorial-exercise-live-code-code-editor");
+		myState.code = editor.getValue();
+		
+		//process data table
+    var JSONstring = $(this).html();
+    var dataframe = JSON.parse(JSONstring);
+    var tableName = dataframe[0].tableName.toString();
+    var data = dataframe[1].data;
+    var attributes = Object.keys(data[0]);
+    var kAttributes = [];
+    for(var i = 0; i < attributes.length; i++)
+    {
+      kAttributes.push({name: attributes[i]})
+    }
+    
+    codapInterface.sendRequest({
+        action:'get',
+        resource: 'dataContext[' + tableName + ']'
+      }).then(function(result){
+        if (result && !result.success) {
+          codapInterface.sendRequest({
+      "action": "create",
+      "resource": "dataContext",
+      "values": {
+        "name": tableName,
+        "collections": [ {
+          "name": tableName,
+          "attrs": kAttributes
+        }]
+      }
+    })
+        } 
+      }).then(function(){
+      codapInterface.sendRequest({
+      "action": "create",
+      "resource": "dataContext[" + tableName + "].item",
+       "values": data
+    })
+    }).then(function(){
+       //guaranteeCaseTable(tableName)
+       codapInterface.sendRequest({action: 'create', resource: 'component', values: {
+            type: 'caseTable',
+            dataContext: tableName
+          }})
+    })
+});
+}
+
+// from example CODAP plugin
+function guaranteeCaseTable(name) {
+  return new Promise(function (resolve, reject) {
+    codapInterface.sendRequest({
+      action: 'get',
+      resource: 'componentList'
+    })
+    .then (function (iResult) {
+      if (iResult.success) {
+        // look for a case table in the list of components.
+        if (iResult.values && iResult.values.some(function (component) {
+              return component.type === 'caseTable'
+            })) {
+          resolve(iResult);
+        } else {
+          codapInterface.sendRequest({action: 'create', resource: 'component', values: {
+            type: 'caseTable',
+            dataContext: name
+          }}).then(function (result) {
+            resolve(result);
+          });
+        }
+      } else {
+        reject('api error');
+      }
+    })
+  });
+}
+
+});
+
+```
