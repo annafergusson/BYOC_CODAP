@@ -26,7 +26,7 @@ My current research is focused on how to support learners (high school students 
 
 There's a lot going on for learners when learning "coding", so the idea behind the BYOC plugin was that perhaps the "code" focus could be on the articulation of the model and initially CODAP could be used for the visualisation of any data generated from the model. 
 
-If you're interested, you can read more about my research here: Anna Fergusson & Maxine Pfannkuch (2021) Introducing teachers who use GUI-driven tools for the randomization test to code-driven tools, Mathematical Thinking and Learning, DOI: 10.1080/10986065.2021.1922856
+If you're interested, you can read more about my research here: Anna Fergusson & Maxine Pfannkuch (2021) Introducing teachers who use GUI-driven tools for the randomization test to code-driven tools, Mathematical Thinking and Learning, DOI: [10.1080/10986065.2021.1922856](https://doi.org/10.1080/10986065.2021.1922856)
 
 
 
