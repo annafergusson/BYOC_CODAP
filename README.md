@@ -22,7 +22,7 @@ That's it for now, but please get in touch if you have ideas or want to do somet
 
 ## Why did you make this?
 
-My current research is focused on how to support learners (high school students & first stage university students) to move from GUI-driven tools (pointy, clicky, draggy etc.) to code-driven tools (text, formulae, syntax, etc.). Related to this, I'm interested in are "hybrid" GUI/code environments, and CODAP seemed to be good place to experiment with this approach. 
+My current research is focused on how to support learners (high school students & first stage university students) to move from GUI-driven tools (pointy, clicky, draggy etc.) to code-driven tools (text, formulae, syntax, etc.). Related to this, I'm interested in "hybrid" GUI/code environments, and CODAP seemed to be good place to experiment with this approach. 
 
 There's a lot going on for learners when learning "coding", so the idea behind the BYOC plugin was that perhaps the "code" focus could be on the articulation of the model and initially CODAP could be used for the visualisation of any data generated from the model. 
 
