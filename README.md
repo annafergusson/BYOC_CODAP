@@ -12,7 +12,7 @@ I'm currently hosting BYOC on my personal shinyapps.io account, which is not for
 
 To use the plugin with CODAP, just change the second part of the URL below to point to your public instance of BYOC :-)
 
-`https://codap.concord.org/releases/latest/static/dg/en/cert/index.html?di=https://annafergusson.shinyapps.io/byoc/`
+`https://codap.concord.org/releases/latest/static/dg/en/cert/index.html?di=https://undercoverdatascience.shinyapps.io/byoc/`
 
 ## How does it work?
 
